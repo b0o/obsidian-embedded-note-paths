@@ -53,7 +53,7 @@ export function getPathForView(
   if (settings.displayLeadingSlash) {
     path = path  && `/${path}`
   }
-  if (settings.displayLeadingSlash) {
+  if (settings.displayTrailingSlash) {
     path = path && `${path}/`
   }
 
