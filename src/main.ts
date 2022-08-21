@@ -283,5 +283,28 @@ class EmbeddedNoteTitlesSettings extends PluginSettingTab {
           });
         });
       });
+
+    new Setting(containerEl)
+      .setName("Display leading slash")
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.displayLeadingSlash)
+          .onChange(async (value) => {
+            this.plugin.settings.displayLeadingSlash = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Display trailing slash")
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.displayTrailingSlash)
+          .onChange(async (value) => {
+            this.plugin.settings.displayTrailingSlash = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
   }
 }

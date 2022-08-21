@@ -49,7 +49,13 @@ export function getTitleForView(
   const frontmatterKey = settings.titleMetadataField;
   const file = view.file;
 
-  let title = file?.basename;
+  let title = file?.path?.includes("/") && file?.path?.replace(/^(.*)\/.*/, "$1")
+  if (settings.displayLeadingSlash) {
+    title = title  && `/${title}`
+  }
+  if (settings.displayLeadingSlash) {
+    title = title && `${title}/`
+  }
 
   if (file) {
     const cache = app.metadataCache.getFileCache(file);
@@ -107,13 +113,14 @@ export function buildTitleDecoration(
             }
           });
 
-          this.header = createEl("h1", {
+          this.header = createEl("code", {
             text: this.title,
             cls: `cm-line embedded-note-title embedded-note-title__edit${
               this.title === " " ? " embedded-note-title__hidden" : ""
             }`,
             attr: {
               id: "title-cm6-" + Math.random().toString(36).substr(2, 9),
+              style: "font-style: italic; opacity: 0.5; font-size: 1rem;",
             },
           });
 

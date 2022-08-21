@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-embedded-note-titles",
-	"name": "Embedded Note Titles",
-	"version": "1.3.0",
+	"id": "obsidian-embedded-note-paths",
+	"name": "Embedded Note Paths",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Inserts the note file name as an H1 heading above each note.",
-	"author": "mgmeyers",
-	"authorUrl": "https://github.com/mgmeyers/obsidian-embedded-note-titles",
+	"author": "b0o",
+	"authorUrl": "https://github.com/b0o/obsidian-embedded-note-paths",
 	"isDesktopOnly": false
 }
