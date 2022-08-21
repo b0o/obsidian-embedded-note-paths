@@ -2,16 +2,16 @@ import { StateEffect } from "@codemirror/state";
 import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { App, CachedMetadata, editorViewField, MarkdownView } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { hideTitleField, Settings } from "./settings";
-import EmbeddedNoteTitlesPlugin from "./main";
+import { hidePathField, Settings } from "./settings";
+import EmbeddedNotePathsPlugin from "./main";
 
-export const updateTitle = StateEffect.define<void>();
+export const updatePath = StateEffect.define<void>();
 
 function shouldHide(cache: CachedMetadata, settings: Settings) {
   if (
     settings.hideOnMetadataField &&
     cache?.frontmatter &&
-    cache.frontmatter[hideTitleField] === false
+    cache.frontmatter[hidePathField] === false
   ) {
     return true;
   }
@@ -41,20 +41,20 @@ function shouldHide(cache: CachedMetadata, settings: Settings) {
   return false;
 }
 
-export function getTitleForView(
+export function getPathForView(
   app: App,
   settings: Settings,
   view: MarkdownView
 ) {
-  const frontmatterKey = settings.titleMetadataField;
+  const frontmatterKey = settings.pathMetadataField;
   const file = view.file;
 
-  let title = file?.path?.includes("/") && file?.path?.replace(/^(.*)\/.*/, "$1")
+  let path = file?.path?.includes("/") && file?.path?.replace(/^(.*)\/.*/, "$1")
   if (settings.displayLeadingSlash) {
-    title = title  && `/${title}`
+    path = path  && `/${path}`
   }
   if (settings.displayLeadingSlash) {
-    title = title && `${title}/`
+    path = path && `${path}/`
   }
 
   if (file) {
@@ -69,57 +69,57 @@ export function getTitleForView(
       cache?.frontmatter &&
       cache.frontmatter[frontmatterKey]
     ) {
-      return cache.frontmatter[frontmatterKey] || title || " ";
+      return cache.frontmatter[frontmatterKey] || path || " ";
     }
   }
 
-  if (file && settings.dailyNoteTitleFormat) {
+  if (file && settings.dailyNotePathFormat) {
     const date = getDateFromFile(file, "day");
 
     if (date) {
-      return date.format(settings.dailyNoteTitleFormat);
+      return date.format(settings.dailyNotePathFormat);
     }
   }
 
-  return title || " ";
+  return path || " ";
 }
 
-export function buildTitleDecoration(
-  plugin: EmbeddedNoteTitlesPlugin,
+export function buildPathDecoration(
+  plugin: EmbeddedNotePathsPlugin,
   getSettings: () => Settings
 ) {
   return [
     ViewPlugin.fromClass(
       class {
         header: HTMLElement;
-        title: string;
+        path: string;
         debounce: number;
 
         constructor(view: EditorView) {
-          this.title = getTitleForView(
+          this.path = getPathForView(
             plugin.app,
             getSettings(),
             view.state.field(editorViewField)
           );
 
-          // This shouldn't happen, but just to be safe, remove any straggling titles
+          // This shouldn't happen, but just to be safe, remove any straggling paths
           view.contentDOM.parentElement.childNodes.forEach((node) => {
             if (
               node instanceof HTMLElement &&
-              node.hasClass("embedded-note-title")
+              node.hasClass("embedded-note-path")
             ) {
-              plugin.unobserveTitle(node);
+              plugin.unobservePath(node);
               node.remove();
             }
           });
 
           this.header = createEl("code", {
-            text: this.title,
-            cls: `cm-line embedded-note-title embedded-note-title__edit${
-              this.title === " " ? " embedded-note-title__hidden" : ""
+            text: this.path,
+            cls: `cm-line embedded-note-path embedded-note-path__edit${
+              this.path === " " ? " embedded-note-path__hidden" : ""
             }`,
             attr: {
-              id: "title-cm6-" + Math.random().toString(36).substr(2, 9),
+              id: "path-cm6-" + Math.random().toString(36).substr(2, 9),
               style: "font-style: italic; opacity: 0.5; font-size: 1rem;",
             },
           });
@@ -128,7 +128,7 @@ export function buildTitleDecoration(
             view.contentDOM.before(this.header);
           })
 
-          plugin.observeTitle(this.header, (entry) => {
+          plugin.observePath(this.header, (entry) => {
             if (entry.borderBoxSize[0]) {
               this.adjustGutter(entry.borderBoxSize[0].blockSize);
             } else {
@@ -155,15 +155,15 @@ export function buildTitleDecoration(
 
             if (currentStyle.contains("--embedded-note")) {
               currentStyle = currentStyle.replace(
-                /--embedded-note-title-height: \d+px;/g,
+                /--embedded-note-path-height: \d+px;/g,
                 ""
               );
             }
 
             if (currentStyle && !currentStyle.endsWith(";")) {
-              currentStyle += `;--embedded-note-title-height: ${padding}px;`;
+              currentStyle += `;--embedded-note-path-height: ${padding}px;`;
             } else {
-              currentStyle += `--embedded-note-title-height: ${padding}px;`;
+              currentStyle += `--embedded-note-path-height: ${padding}px;`;
             }
 
             dom.setAttribute("style", currentStyle);
@@ -176,7 +176,7 @@ export function buildTitleDecoration(
 
           if (currentStyle && currentStyle.contains("--embedded-note")) {
             currentStyle = currentStyle.replace(
-              /--embedded-note-title-height: \d+px;/g,
+              /--embedded-note-path-height: \d+px;/g,
               ""
             );
 
@@ -187,24 +187,24 @@ export function buildTitleDecoration(
         update(viewUpdate: ViewUpdate) {
           viewUpdate.transactions.forEach((tr) => {
             for (let e of tr.effects) {
-              if (e.is(updateTitle)) {
-                const newTitle = getTitleForView(
+              if (e.is(updatePath)) {
+                const newPath = getPathForView(
                   plugin.app,
                   getSettings(),
                   tr.state.field(editorViewField)
                 );
 
-                if (this.title === newTitle) {
+                if (this.path === newPath) {
                   return;
                 }
 
-                this.title = newTitle;
-                this.header.setText(this.title);
+                this.path = newPath;
+                this.header.setText(this.path);
 
-                if (this.title === " ") {
-                  this.header.classList.add("embedded-note-title__hidden");
+                if (this.path === " ") {
+                  this.header.classList.add("embedded-note-path__hidden");
                 } else {
-                  this.header.classList.remove("embedded-note-title__hidden");
+                  this.header.classList.remove("embedded-note-path__hidden");
                 }
               }
             }
@@ -212,7 +212,7 @@ export function buildTitleDecoration(
         }
 
         destroy() {
-          plugin.unobserveTitle(this.header);
+          plugin.unobservePath(this.header);
           this.header.remove();
           this.header = null;
         }

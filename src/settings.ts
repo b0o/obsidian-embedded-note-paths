@@ -1,10 +1,10 @@
 export interface Settings {
-  titleMetadataField?: string;
+  pathMetadataField?: string;
   hideOnH1?: boolean;
   hideOnMetadataField?: boolean;
-  dailyNoteTitleFormat?: string;
+  dailyNotePathFormat?: string;
   displayLeadingSlash?: boolean;
   displayTrailingSlash?: boolean;
 }
 
-export const hideTitleField = 'embedded-title'
+export const hidePathField = 'embedded-path'

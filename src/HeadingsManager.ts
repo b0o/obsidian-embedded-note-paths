@@ -2,7 +2,7 @@ import { App, MarkdownView, WorkspaceLeaf } from "obsidian";
 
 import { Settings } from "./settings";
 import { getMatchedCSSRules } from "./getMatchedCSSRules";
-import { getTitleForView } from "./titleDecoration";
+import { getPathForView } from "./pathDecoration";
 
 interface RefSizing {
   width?: string;
@@ -140,7 +140,7 @@ export class PreviewHeadingsManager {
 
     const doc = leaf.view.containerEl.ownerDocument;
 
-    const title = getTitleForView(
+    const path = getPathForView(
       leaf.view.app,
       this.getSettings(),
       leaf.view as MarkdownView
@@ -171,15 +171,15 @@ export class PreviewHeadingsManager {
 
       applyRefStyles(h1Preview, this.previewSizerRef);
 
-      h1Preview.setText(title);
+      h1Preview.setText(path);
       h1Preview.id = `${id}-preview`;
       h1Preview.classList.add(
-        "embedded-note-title",
-        "embedded-note-title__preview"
+        "embedded-note-path",
+        "embedded-note-path__preview"
       );
 
-      if (title === "") {
-        h1Preview.classList.add("embedded-note-title__hidden");
+      if (path === "") {
+        h1Preview.classList.add("embedded-note-path__hidden");
       }
 
       previewEl.prepend(h1Preview);
@@ -190,7 +190,7 @@ export class PreviewHeadingsManager {
 
   // Generate a unique ID for a leaf
   getLeafId(leaf: WorkspaceLeaf) {
-    return "title-" + Math.random().toString(36).substring(2, 9);
+    return "path-" + Math.random().toString(36).substring(2, 9);
   }
 
   // Iterate through all leafs and generate headings if needed

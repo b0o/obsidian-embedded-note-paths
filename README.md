@@ -1,6 +1,6 @@
 ## Obsidian Embedded Note Paths Plugin
 
-This plugin embeds the note title at the top of each note in both preview and edit mode. This plugin does not modify notes, and the title is not a part of the document itself.
+This plugin embeds the note path at the top of each note in both preview and edit mode. This plugin does not modify notes, and the path is not a part of the document itself.
 
 **Features:**
 
@@ -13,14 +13,14 @@ This plugin embeds the note title at the top of each note in both preview and ed
 
 ### Note
 
-In general, this plugin attempts to size the paths to align with the note content. Some themes may have styling that conflicts with these calculations. If you notice misalignment between the title and the note, the paths can be styled via css like so:
+In general, this plugin attempts to size the paths to align with the note content. Some themes may have styling that conflicts with these calculations. If you notice misalignment between the path and the note, the paths can be styled via css like so:
 
 ```css
-h1.embedded-note-title {
+h1.embedded-note-path {
   /* ...reading mode styles... */
 }
 
-h1.cm-line.embedded-note-title {
+h1.cm-line.embedded-note-path {
   /* ... live preview / edit mode styles ... */
 }
 ```
@@ -28,11 +28,11 @@ h1.cm-line.embedded-note-title {
 You may also need to account for readable line length:
 
 ```css
-.is-readable-line-width h1.embedded-note-title {
+.is-readable-line-width h1.embedded-note-path {
   /* ...reading mode styles... */
 }
 
-.is-readable-line-width h1.cm-line.embedded-note-title {
+.is-readable-line-width h1.cm-line.embedded-note-path {
   /* ...reading mode styles... */
 }
 ```

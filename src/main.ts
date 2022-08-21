@@ -10,23 +10,23 @@ import {
 import { getDailyNoteSettings } from "obsidian-daily-notes-interface";
 import { PreviewHeadingsManager } from "./HeadingsManager";
 import { Settings } from "./settings";
-import { buildTitleDecoration, updateTitle } from "./titleDecoration";
+import { buildPathDecoration, updatePath } from "./pathDecoration";
 
-export default class EmbeddedNoteTitlesPlugin extends Plugin {
+export default class EmbeddedNotePathsPlugin extends Plugin {
   settings: Settings;
   isLegacyEditor: boolean;
 
   previewHeadingsManager: PreviewHeadingsManager;
 
   observer: ResizeObserver;
-  observedTitles: Map<HTMLElement, (entry: ResizeObserverEntry) => void>;
+  observedPaths: Map<HTMLElement, (entry: ResizeObserverEntry) => void>;
 
   async onload() {
-    document.body.classList.add("embedded-note-titles");
+    document.body.classList.add("embedded-note-paths");
 
     await this.loadSettings();
 
-    this.addSettingTab(new EmbeddedNoteTitlesSettings(this.app, this));
+    this.addSettingTab(new EmbeddedNotePathsSettings(this.app, this));
 
     const getSettings = () => this.settings;
 
@@ -35,16 +35,16 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
     this.isLegacyEditor = (this.app.vault as any).getConfig("legacyEditor");
 
     if (!this.isLegacyEditor) {
-      this.observedTitles = new Map();
+      this.observedPaths = new Map();
       this.observer = new ResizeObserver((entries) => {
         entries.forEach((entry) => {
-          if (this.observedTitles.has(entry.target as HTMLElement)) {
-            this.observedTitles.get(entry.target as HTMLElement)(entry);
+          if (this.observedPaths.has(entry.target as HTMLElement)) {
+            this.observedPaths.get(entry.target as HTMLElement)(entry);
           }
         });
       });
 
-      this.registerEditorExtension(buildTitleDecoration(this, getSettings));
+      this.registerEditorExtension(buildPathDecoration(this, getSettings));
 
       const notifyFileChange = (file: TFile) => {
         const markdownLeaves = this.app.workspace.getLeavesOfType("markdown");
@@ -54,7 +54,7 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
 
           if (view.file === file) {
             ((view.editor as any).cm as EditorView).dispatch({
-              effects: updateTitle.of(),
+              effects: updatePath.of(),
             });
           }
         });
@@ -64,7 +64,7 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
 
       this.registerEvent(
         this.app.metadataCache.on("changed", (file) => {
-          const frontmatterKey = this.settings.titleMetadataField;
+          const frontmatterKey = this.settings.pathMetadataField;
           const hideOnH1 = this.settings.hideOnH1;
 
           if (frontmatterKey || hideOnH1) {
@@ -76,7 +76,7 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
 
     this.registerEvent(
       this.app.metadataCache.on("changed", (file) => {
-        const frontmatterKey = this.settings.titleMetadataField;
+        const frontmatterKey = this.settings.pathMetadataField;
         const hideOnH1 = this.settings.hideOnH1;
 
         if (frontmatterKey || hideOnH1) {
@@ -104,13 +104,13 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
 
         if (!this.isLegacyEditor) {
           setTimeout(() => {
-            this.observedTitles.forEach((_, el) => {
+            this.observedPaths.forEach((_, el) => {
               if (
                 this.app.workspace
                   .getLeavesOfType("markdown")
                   .every((leaf) => !leaf.view.containerEl.find(`#${el.id}`))
               ) {
-                this.unobserveTitle(el);
+                this.unobservePath(el);
                 el.remove();
               }
             });
@@ -137,26 +137,26 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
   }
 
   onunload() {
-    document.body.classList.remove("embedded-note-titles");
+    document.body.classList.remove("embedded-note-paths");
 
     this.previewHeadingsManager.cleanup();
     this.observer.disconnect();
-    this.observedTitles.forEach((_, el) => {
+    this.observedPaths.forEach((_, el) => {
       el.remove();
     });
-    this.observedTitles.clear();
+    this.observedPaths.clear();
   }
 
-  observeTitle(el: HTMLElement, cb: (entry: ResizeObserverEntry) => void) {
-    this.observedTitles.set(el, cb);
+  observePath(el: HTMLElement, cb: (entry: ResizeObserverEntry) => void) {
+    this.observedPaths.set(el, cb);
     this.observer.observe(el, {
       box: "border-box",
     });
   }
 
-  unobserveTitle(el: HTMLElement) {
-    if (this.observedTitles.has(el)) {
-      this.observedTitles.delete(el);
+  unobservePath(el: HTMLElement) {
+    if (this.observedPaths.has(el)) {
+      this.observedPaths.delete(el);
       this.observer.unobserve(el);
     }
   }
@@ -173,7 +173,7 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
         const view = leaf.view as MarkdownView;
 
         ((view.editor as any).cm as EditorView).dispatch({
-          effects: updateTitle.of(),
+          effects: updatePath.of(),
         });
       });
     }
@@ -188,10 +188,10 @@ export default class EmbeddedNoteTitlesPlugin extends Plugin {
   }
 }
 
-class EmbeddedNoteTitlesSettings extends PluginSettingTab {
-  plugin: EmbeddedNoteTitlesPlugin;
+class EmbeddedNotePathsSettings extends PluginSettingTab {
+  plugin: EmbeddedNotePathsPlugin;
 
-  constructor(app: App, plugin: EmbeddedNoteTitlesPlugin) {
+  constructor(app: App, plugin: EmbeddedNotePathsPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -202,21 +202,21 @@ class EmbeddedNoteTitlesSettings extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Frontmatter field as title")
+      .setName("Frontmatter field as path")
       .setDesc(
-        "When a file contains this frontmatter field, it will be used as the embedded title"
+        "When a file contains this frontmatter field, it will be used as the embedded path"
       )
       .addText((text) => {
         text
-          .setValue(this.plugin.settings.titleMetadataField || "")
+          .setValue(this.plugin.settings.pathMetadataField || "")
           .onChange(async (value) => {
-            this.plugin.settings.titleMetadataField = value;
+            this.plugin.settings.pathMetadataField = value;
             await this.plugin.saveSettings();
           });
       });
 
     new Setting(containerEl)
-      .setName("Hide embedded title when level 1 heading is present")
+      .setName("Hide embedded path when level 1 heading is present")
       .addToggle((toggle) => {
         toggle
           .setValue(this.plugin.settings.hideOnH1)
@@ -227,7 +227,7 @@ class EmbeddedNoteTitlesSettings extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Hide embedded title using metadata `embedded-title: false`")
+      .setName("Hide embedded path using metadata `embedded-path: false`")
       .addToggle((toggle) => {
         toggle
           .setValue(this.plugin.settings.hideOnMetadataField)
@@ -238,13 +238,13 @@ class EmbeddedNoteTitlesSettings extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Daily note title format")
+      .setName("Daily note path format")
       .then((setting) => {
         setting.addMomentFormat((mf) => {
           setting.descEl.appendChild(
             createFragment((frag) => {
               frag.appendText(
-                "This format will be used when displaying titles of daily notes."
+                "This format will be used when displaying paths of daily notes."
               );
               frag.createEl("br");
               frag.appendText("For more syntax, refer to ");
@@ -271,12 +271,12 @@ class EmbeddedNoteTitlesSettings extends PluginSettingTab {
           mf.setPlaceholder(defaultFormat);
           mf.setDefaultFormat(defaultFormat);
 
-          if (this.plugin.settings.dailyNoteTitleFormat) {
-            mf.setValue(this.plugin.settings.dailyNoteTitleFormat);
+          if (this.plugin.settings.dailyNotePathFormat) {
+            mf.setValue(this.plugin.settings.dailyNotePathFormat);
           }
 
           mf.onChange(async (value) => {
-            this.plugin.settings.dailyNoteTitleFormat = value
+            this.plugin.settings.dailyNotePathFormat = value
               ? value
               : undefined;
             await this.plugin.saveSettings();
