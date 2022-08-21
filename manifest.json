@@ -3,7 +3,7 @@
 	"name": "Embedded Note Paths",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Inserts the note file name as an H1 heading above each note.",
+	"description": "Inserts the note file path above each note.",
 	"author": "b0o",
 	"authorUrl": "https://github.com/b0o/obsidian-embedded-note-paths",
 	"isDesktopOnly": false
