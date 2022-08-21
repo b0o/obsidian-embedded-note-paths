@@ -7,6 +7,7 @@ This plugin embeds the note title at the top of each note in both preview and ed
 - The embedded paths can be styled using the Style Settings plugin
 - Paths can be hidden or overridden by a file's frontmatter
 - Paths can be hidden if when a level 1 heading is present
+- Leading/trailing slashes can be enabled if desired
 
 <img src="https://user-images.githubusercontent.com/21299126/185779567-ba379655-9ed7-495c-841c-112a76101698.png" alt="Screenshot of embedded paths plugin" />
 
