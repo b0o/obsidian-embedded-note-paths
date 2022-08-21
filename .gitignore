@@ -1,7 +1,6 @@
-# npm
 node_modules
+.yarn
 
-# build
 *.js.map
 .DS_Store
 .hotreload
