@@ -1,7 +1,7 @@
 {
   "id": "obsidian-embedded-note-paths",
   "name": "Embedded Note Paths",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "minAppVersion": "0.15.0",
   "description": "Inserts the note file path above each note.",
   "author": "b0o",
