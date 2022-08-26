@@ -306,5 +306,16 @@ class EmbeddedNotePathsSettings extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Display filename")
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.displayFilename)
+          .onChange(async (value) => {
+            this.plugin.settings.displayFilename = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
   }
 }

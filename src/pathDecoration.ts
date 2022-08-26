@@ -51,9 +51,11 @@ export function getPathForView(
 
   let path = file?.path?.includes("/") && file?.path?.replace(/^(.*)\/.*/, "$1")
   if (settings.displayLeadingSlash) {
-    path = path  && `/${path}`
+    path = path && `/${path}`
   }
-  if (settings.displayTrailingSlash) {
+  if (settings.displayFilename) {
+    path = path && `${path}/${file.basename}`
+  } else if (settings.displayTrailingSlash) {
     path = path && `${path}/`
   }
 

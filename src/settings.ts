@@ -5,6 +5,7 @@ export interface Settings {
   dailyNotePathFormat?: string;
   displayLeadingSlash?: boolean;
   displayTrailingSlash?: boolean;
+  displayFilename?: boolean;
 }
 
 export const hidePathField = 'embedded-path'
