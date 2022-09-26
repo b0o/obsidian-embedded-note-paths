@@ -1,4 +1,9 @@
+## This plugin is archived!
+
+Obsidian `0.16.3` includes a better native implementation of this plugin, which can be enabled at `Settings > Appearance > Show tab title bar`. This plugin will continue to work with Obsidian `0.15.x`, but it won't be updated going forward.
+
 ## Obsidian Embedded Note Paths Plugin
+
 
 This plugin embeds the note path at the top of each note in both preview and edit mode. This plugin does not modify notes, and the path is not a part of the document itself.
 
